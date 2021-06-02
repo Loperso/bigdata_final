@@ -1,0 +1,62 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+<div style="height:700px;width:900px;">
+  <canvas id="myChart"></canvas>
+</div>
+
+<script>
+const labels = ['casa', 'verde', 'azul'];
+const data = {
+  labels: labels,
+  datasets: [{
+    axis: 'y',
+    label: 'Acciones en vivo',
+    data: [],
+    backgroundColor: [
+      'rgba(255, 99, 132, 0.2)',
+    ],
+    borderColor: [
+      'rgb(255, 99, 132)',
+    ],
+    borderWidth: 1
+  }]
+};
+
+const config = {
+  type: 'bar',
+  data: data,
+  options: {
+   responsive: true,
+   indexAxis: 'x',
+   scales: {
+      y: {
+        beginAtZero: false
+      }
+   }
+  },
+};
+
+
+var myChart = new Chart(
+     document.getElementById('myChart'),
+     config);
+
+function update(){
+
+axios.get('http://54.237.6.245:8080/dashboard').then(function (response){
+	values = []
+	for (var i in response['data']){
+		values.push([parseInt(response['data'][i]['max']), parseInt(response['data'][i]['min'])]);
+	}
+	console.log(values)
+        myChart.data.labels = Object.keys(response['data'])
+        myChart.data.datasets[0].data = values
+        myChart.update();
+});
+}
+
+setInterval(update, 1000);
+
+</script>
